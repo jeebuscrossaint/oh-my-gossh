@@ -6,7 +6,10 @@ fn main() {
         detect_sys::detect_distro::find_distro().expect("Failed to find distro");
     } else if os_name == "Windows" {
         detect_sys::detect_win::det_win();
-} else {
+    } else if os_name == "macOS" {
+        detect_sys::detect_mac::det_mac();
+    }
+     else {
     println!("test");
-}
+    }
 }
