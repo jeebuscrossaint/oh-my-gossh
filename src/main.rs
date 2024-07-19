@@ -8,6 +8,8 @@ fn main() {
         detect_sys::detect_win::det_win();
     } else if os_name == "macOS" {
         detect_sys::detect_mac::det_mac();
+    } else if os_name == "BSD" {
+        detect_sys::detect_flavor::detect_bsd_variant();
     }
      else {
     println!("test");
