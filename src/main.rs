@@ -10,6 +10,8 @@ fn main() {
         detect_sys::detect_mac::det_mac();
     } else if os_name == "BSD" {
         detect_sys::detect_flavor::detect_bsd_variant();
+    } else if os_name == "Android" {
+        detect_sys::detect_termux::det_termux();
     }
      else {
     println!("test");

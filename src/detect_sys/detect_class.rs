@@ -9,6 +9,7 @@ pub fn find_os() -> &'static str {
         "bsd" => "BSD",
         "windows" => "Windows",
         "linux" => "Linux",
+        "android" => "Android",
         _ => {
             println!("Unknown OS, please report what you are running.");
             exit(1);

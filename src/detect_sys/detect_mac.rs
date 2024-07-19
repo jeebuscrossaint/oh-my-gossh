@@ -18,6 +18,7 @@ pub fn det_mac() -> Option<String> {
         };
 
         if Path::new(brew_path).exists() {
+            println!("Detected Homebrew at: {}", brew_path);
             Some(brew_path.to_string())
         } else {
             None
