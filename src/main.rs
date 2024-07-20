@@ -1,15 +1,32 @@
 mod detect_sys;
-mod linux;
+mod linux_spec;
 
-// In src/main.rs
 fn main() {
     let os_name = detect_sys::detect_class::find_os();
     if os_name == "Linux" {
         let distro = detect_sys::detect_distro::find_distro().expect("Failed to find distro");
         if distro == "debian" {
-            linux::debian::det_debian();
+            linux_spec::debian::det_debian();
+        } else if distro == "arch" {
+            linux_spec::arch::det_arch();
+        } else if distro == "alpine" {
+            linux_spec::alpine::det_alpine();
+        } else if distro == "android" {
+            linux_spec::android::det_termux();
+        } else if distro == "fedora" {
+            linux_spec::fedora::det_fedora();
+        } else if distro == "gentoo" {
+            linux_spec::gentoo::det_gentoo();
+        } else if distro == "redhat" {
+            linux_spec::redhat::det_redhat();
+        } else if distro == "suse" {
+            linux_spec::suse::det_suse();
+        } else if distro == "slackware" {
+            linux_spec::slackware::det_slackware();
+        } else if distro == "void" {
+            linux_spec::void::det_void();
         } else {
-            println!("Unsupported distro");
+            println!("Unsupported Distro");
         }
     } else if os_name == "Windows" {
         detect_sys::detect_win::det_win();
