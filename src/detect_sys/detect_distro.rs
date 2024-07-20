@@ -12,8 +12,9 @@ pub fn find_distro() -> io::Result<String> {
     for line in reader.lines() {
         let line = line?;
         if line.starts_with("ID=") {
-            //let distro = line.split('=').nth(1).unwrap();
-            break;
+            let distro = line.split('=').nth(1).unwrap().trim().to_string();
+            println!("Detected distro: {}", distro);
+            return Ok(distro); // Return the distro name here
         }
     }
 

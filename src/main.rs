@@ -8,6 +8,8 @@ fn main() {
         let distro = detect_sys::detect_distro::find_distro().expect("Failed to find distro");
         if distro == "debian" {
             linux::debian::det_debian();
+        } else {
+            println!("Unsupported distro");
         }
     } else if os_name == "Windows" {
         detect_sys::detect_win::det_win();
