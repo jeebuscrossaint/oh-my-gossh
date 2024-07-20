@@ -48,6 +48,7 @@ fn main() {
         }
     } else if os_name == "Android" {
         detect_sys::detect_termux::det_termux();
+        linux_spec::android::det_termux();
     }
     else {
         println!("Unsupported OS");
