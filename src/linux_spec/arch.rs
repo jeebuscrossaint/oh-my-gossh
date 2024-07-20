@@ -8,15 +8,15 @@ pub fn det_arch() -> Option<String> {
     let yay_path = "/usr/bin/yay";
     let paru_path = "/usr/bin/paru";
 
-    if Command::new(pacman_path).arg("--version").output().is_ok() {
-        println!("Detected pacman at: {}", pacman_path);
-        Some(pacman_path.to_string())
+    if Command::new(paru_path).arg("--version").output().is_ok() {
+        println!("Detected paru at: {}", paru_path);
+        Some(paru_path.to_string())
     } else if Command::new(yay_path).arg("--version").output().is_ok() {
         println!("Detected yay at: {}", yay_path);
         Some(yay_path.to_string())
-    } else if Command::new(paru_path).arg("--version").output().is_ok() {
-        println!("Detected paru at: {}", paru_path);
-        Some(paru_path.to_string())
+    } else if Command::new(pacman_path).arg("--version").output().is_ok() {
+        println!("Detected pacman at: {}", pacman_path);
+        Some(pacman_path.to_string())
     } else {
         None
     }

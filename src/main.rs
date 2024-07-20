@@ -1,5 +1,6 @@
 mod detect_sys;
 mod linux_spec;
+mod bsd_flav;
 
 fn main() {
     let os_name = detect_sys::detect_class::find_os();
@@ -33,7 +34,18 @@ fn main() {
     } else if os_name == "macOS" {
         detect_sys::detect_mac::det_mac();
     } else if os_name == "BSD" {
-        detect_sys::detect_flavor::detect_bsd_variant();
+        detect_sys::detect_flavor::detect_bsd_variant().expect("Failed to detect BSD variant");
+        if os_name == "FreeBSD" {
+            bsd_flav::free::det_freebsd();
+        } else if os_name == "OpenBSD" {
+            bsd_flav::open::det_openbsd();
+        } else if os_name == "NetBSD" {
+            bsd_flav::net::det_netbsd();
+        } else if os_name == "DragonFly" {
+            bsd_flav::dragonfly::det_dragonfly();
+        } else {
+            println!("Unsupported BSD variant");
+        }
     } else if os_name == "Android" {
         detect_sys::detect_termux::det_termux();
     }
