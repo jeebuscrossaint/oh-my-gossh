@@ -82,7 +82,6 @@ pub fn search_package(package_name: &str) {
         let error_message = String::from_utf8_lossy(&output.stderr);
         println!("Failed to search for package: {}", error_message);
     }
-
 }
 
 pub fn bucket_mng(bucket_name: &str) {
