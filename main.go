@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
+	"golang.org/x/term"
 )
 
 type model struct {
@@ -19,7 +20,6 @@ type model struct {
 	content   string
 	header    string
 	err       error
-	waiting   bool
 }
 
 func initialModel(content, header string) model {
@@ -35,7 +35,6 @@ func initialModel(content, header string) model {
 		content:   content,
 		header:    header,
 		err:       nil,
-		waiting:   true,
 	}
 }
 
@@ -44,18 +43,6 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.waiting {
-		switch msg := msg.(type) {
-		case tea.KeyMsg:
-			m.waiting = false
-		case tea.MouseMsg:
-			if msg.Type == tea.MouseLeft {
-				m.waiting = false
-			}
-		}
-		return m, nil
-	}
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -77,9 +64,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	if m.waiting {
-		return "Welcome to my Portfolio! \nEnjoy your stay! \nPlease hire me! \n\nPress any key to continue..."
-	}
 	return fmt.Sprintf("%s\n\n%s\n\n%s", m.header, m.viewport.View(), m.paginator.View())
 }
 
@@ -95,6 +79,19 @@ func typeOutText(text string) {
 	}
 }
 
+func centerText(text string, width int) string {
+	lines := strings.Split(text, "\n")
+	var centeredLines []string
+	for _, line := range lines {
+		padding := (width - len(line)) / 2
+		if padding < 0 {
+			padding = 0
+		}
+		centeredLines = append(centeredLines, strings.Repeat(" ", padding)+line)
+	}
+	return strings.Join(centeredLines, "\n")
+}
+
 func main() {
 	// Read the ASCII header from ascii.conf
 	asciiHeader, err := ioutil.ReadFile("assets/ascii.conf")
@@ -103,8 +100,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Apply ANSI escape code for white color
-	whiteAsciiHeader := "\033[37m" + string(asciiHeader) + "\033[0m"
+	// Apply ANSI escape code for green color and center the ASCII header
+	greenAsciiHeader := "\033[32m" + centerText(string(asciiHeader), 80) + "\033[0m"
 
 	// Read the main content from portfolio.md
 	content, err := ioutil.ReadFile("portfolio.md")
@@ -124,10 +121,30 @@ func main() {
 	welcomeMessage := "Welcome to my Portfolio! \nEnjoy your stay! \nPlease hire me! \nPress any key to continue..."
 	typeOutText(welcomeMessage)
 
+	// Wait for a single keypress
+	waitForKeyPress()
+
+	// Clear the screen
+	fmt.Print("\033[H\033[2J")
+
 	// Initialize the TUI program with the content and header
-	p := tea.NewProgram(initialModel(string(renderedContent), whiteAsciiHeader))
+	p := tea.NewProgram(initialModel(string(renderedContent), greenAsciiHeader))
 	if err := p.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
+}
+
+func waitForKeyPress() {
+	// Put terminal into raw mode
+	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+	if err != nil {
+		fmt.Println("Failed to set raw mode:", err)
+		return
+	}
+	defer term.Restore(int(os.Stdin.Fd()), oldState)
+
+	// Read a single byte
+	buffer := make([]byte, 1)
+	os.Stdin.Read(buffer)
 }
