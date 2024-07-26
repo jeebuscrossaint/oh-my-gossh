@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/paginator"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -18,6 +19,7 @@ type model struct {
 	content   string
 	header    string
 	err       error
+	waiting   bool
 }
 
 func initialModel(content, header string) model {
@@ -33,6 +35,7 @@ func initialModel(content, header string) model {
 		content:   content,
 		header:    header,
 		err:       nil,
+		waiting:   true,
 	}
 }
 
@@ -41,6 +44,18 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.waiting {
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			m.waiting = false
+		case tea.MouseMsg:
+			if msg.Type == tea.MouseLeft {
+				m.waiting = false
+			}
+		}
+		return m, nil
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -62,64 +77,55 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return fmt.Sprintf("%s\n\n%s\n\n%s", centerText(m.header, 80), m.viewport.View(), m.paginator.View())
+	if m.waiting {
+		return "Welcome to my Portfolio! \nEnjoy your stay! \nPlease hire me! \n\nPress any key to continue..."
+	}
+	return fmt.Sprintf("%s\n\n%s\n\n%s", m.header, m.viewport.View(), m.paginator.View())
 }
 
-func centerText(text string, width int) string {
+func typeOutText(text string) {
 	lines := strings.Split(text, "\n")
-	var centeredLines []string
 	for _, line := range lines {
-		padding := (width - len(line)) / 2
-		if padding < 0 {
-			padding = 0
+		for i := 0; i <= len(line); i++ {
+			fmt.Print("\033[H\033[2J") // Clear the screen
+			fmt.Println(line[:i])
+			time.Sleep(50 * time.Millisecond)
 		}
-		centeredLines = append(centeredLines, strings.Repeat(" ", padding)+line)
+		time.Sleep(500 * time.Millisecond) // Pause after each line
 	}
-	return strings.Join(centeredLines, "\n")
-}
-
-func extractHeader(content string) (string, string) {
-	lines := strings.Split(content, "\n")
-	var headerLines []string
-	var contentLines []string
-	inHeaderSection := false
-
-	for _, line := range lines {
-		if strings.HasPrefix(line, "# ASCII") {
-			inHeaderSection = true
-			continue
-		}
-		if inHeaderSection {
-			if strings.HasPrefix(line, "#") {
-				inHeaderSection = false
-			} else {
-				headerLines = append(headerLines, line)
-				continue
-			}
-		}
-		contentLines = append(contentLines, line)
-	}
-
-	return strings.Join(headerLines, "\n"), strings.Join(contentLines, "\n")
 }
 
 func main() {
-	filePath := "portfolio.md"
-	content, err := ioutil.ReadFile(filePath)
+	// Read the ASCII header from ascii.conf
+	asciiHeader, err := ioutil.ReadFile("assets/ascii.conf")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error reading ASCII header file: %v\n", err)
 		os.Exit(1)
 	}
 
-	header, modifiedContent := extractHeader(string(content))
+	// Apply ANSI escape code for white color
+	whiteAsciiHeader := "\033[37m" + string(asciiHeader) + "\033[0m"
 
-	renderedContent, err := glamour.RenderBytes([]byte(modifiedContent), "dark")
+	// Read the main content from portfolio.md
+	content, err := ioutil.ReadFile("portfolio.md")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading content file: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Render the markdown content
+	renderedContent, err := glamour.RenderBytes(content, "dark")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error rendering markdown: %v\n", err)
 		os.Exit(1)
 	}
 
-	p := tea.NewProgram(initialModel(string(renderedContent), header))
+	// Display the typing animation welcome message
+	welcomeMessage := "Welcome to my Portfolio! \nEnjoy your stay! \nPlease hire me! \nPress any key to continue..."
+	typeOutText(welcomeMessage)
+
+	// Initialize the TUI program with the content and header
+	p := tea.NewProgram(initialModel(string(renderedContent), whiteAsciiHeader))
 	if err := p.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
