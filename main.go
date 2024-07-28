@@ -64,7 +64,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return fmt.Sprintf("%s\n\n%s\n\n%s", m.header, m.viewport.View(), m.paginator.View())
+	separator := strings.Repeat("_", 80)
+	return fmt.Sprintf("%s\n\n%s\n\n%s\n\n%s", m.header, separator, m.viewport.View(), m.paginator.View())
 }
 
 func typeOutText(text string) {
@@ -72,7 +73,7 @@ func typeOutText(text string) {
 	for _, line := range lines {
 		for i := 0; i <= len(line); i++ {
 			fmt.Print("\033[H\033[2J") // Clear the screen
-			fmt.Println(line[:i])
+			fmt.Printf("\033[38;2;0;255;0m%s\033[0m\n", line[:i])
 			time.Sleep(50 * time.Millisecond)
 		}
 		time.Sleep(500 * time.Millisecond) // Pause after each line
@@ -92,19 +93,37 @@ func centerText(text string, width int) string {
 	return strings.Join(centeredLines, "\n")
 }
 
-func main() {
-	// Read the ASCII header from ascii.conf
-	asciiHeader, err := ioutil.ReadFile("assets/ascii.conf")
+func waitForKeyPress() {
+	// Put terminal into raw mode
+	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading ASCII header file: %v\n", err)
-		os.Exit(1)
+		fmt.Println("Failed to set raw mode:", err)
+		return
 	}
+	defer term.Restore(int(os.Stdin.Fd()), oldState)
+
+	// Read a single byte
+	buffer := make([]byte, 1)
+	os.Stdin.Read(buffer)
+}
+
+func main() {
+	// Hardcoded ASCII header
+	asciiHeader := `
+                  :::       :::   :::       :::     :::::::::  ::::    :::     ::: ::::::::::: :::    :::          :::::::::     ::: ::::::::::: :::::::::: :::  
+               :+: :+:    :+:+: :+:+:    :+: :+:   :+:    :+: :+:+:   :+:   :+: :+:   :+:     :+:    :+:          :+:    :+:  :+: :+:   :+:     :+:        :+:   
+             +:+   +:+  +:+ +:+:+ +:+  +:+   +:+  +:+    +:+ :+:+:+  +:+  +:+   +:+  +:+     +:+    +:+          +:+    +:+ +:+   +:+  +:+     +:+        +:+    
+           +#++:++#++: +#+  +:+  +#+ +#++:++#++: +#++:++#:  +#+ +:+ +#+ +#++:++#++: +#+     +#++:++#++          +#++:++#+ +#++:++#++: +#+     +#++:++#   +#+     
+          +#+     +#+ +#+       +#+ +#+     +#+ +#+    +#+ +#+  +#+#+# +#+     +#+ +#+     +#+    +#+          +#+       +#+     +#+ +#+     +#+        +#+      
+         #+#     #+# #+#       #+# #+#     #+# #+#    #+# #+#   #+#+# #+#     #+# #+#     #+#    #+#          #+#       #+#     #+# #+#     #+#        #+#       
+        ###     ### ###       ### ###     ### ###    ### ###    #### ###     ### ###     ###    ###          ###       ###     ### ###     ########## ########## 
+`
 
 	// Apply ANSI escape code for green color and center the ASCII header
-	greenAsciiHeader := "\033[32m" + centerText(string(asciiHeader), 80) + "\033[0m"
+	greenAsciiHeader := "\033[38;2;0;255;0m" + centerText(asciiHeader, 80) + "\033[0m"
 
 	// Read the main content from portfolio.md
-	content, err := ioutil.ReadFile("portfolio.md")
+	content, err := ioutil.ReadFile("assets/portfolio.md")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading content file: %v\n", err)
 		os.Exit(1)
@@ -133,18 +152,4 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
-}
-
-func waitForKeyPress() {
-	// Put terminal into raw mode
-	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
-	if err != nil {
-		fmt.Println("Failed to set raw mode:", err)
-		return
-	}
-	defer term.Restore(int(os.Stdin.Fd()), oldState)
-
-	// Read a single byte
-	buffer := make([]byte, 1)
-	os.Stdin.Read(buffer)
 }
