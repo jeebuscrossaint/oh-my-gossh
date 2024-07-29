@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
+
 	//"github.com/charmbracelet/bubbles/paginator"
 	//"github.com/charmbracelet/bubbles/viewport"
 	//tea "github.com/charmbracelet/bubbletea"
 	//"github.com/charmbracelet/glamour"
-	//"golang.org/x/term"
+	"golang.org/x/term"
 )
 
 /*
@@ -102,12 +104,14 @@ const ASCIIHeader string = `
 ###     ### ###       ### ###     ### ###    ### ###    #### ###     ### ###     ###    ###      ###       ###     ### ###     ########## ########## 
 `
 
+// check is a helper function to check for errors
 func check(e error, check string) {
 	if e != nil {
 		fmt.Printf("Error running program - In %v: %v", check, e)
 	}
 }
 
+// begin area for quote generation
 func generateQuote() {
 	filePath := "assets/quotes.txt"
 	lines, err := countLines(filePath)
@@ -160,7 +164,43 @@ func getLineContent(filePath string, lineNumber int) (string, error) {
 	return "", fmt.Errorf("line not found")
 }
 
+// end area for quote generation
+
+// begin text animation and introduction manipulation
+
+func typeOutText(text string) {
+	lines := strings.Split(text, "\n")
+	for _, line := range lines {
+		for i := 0; i <= len(line); i++ {
+			fmt.Print("\033[H\033[2J") // Clear the screen
+			fmt.Printf("\033[38;2;0;255;0m%s\033[0m\n", line[:i])
+			time.Sleep(50 * time.Millisecond)
+		}
+		time.Sleep(500 * time.Millisecond) // Pause after each line
+	}
+}
+
+func waitForKeyPress() {
+	// Put terminal into raw mode
+	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
+	if err != nil {
+		fmt.Println("Failed to set raw mode:", err)
+		return
+	}
+	defer term.Restore(int(os.Stdin.Fd()), oldState)
+
+	// Read a single byte
+	buffer := make([]byte, 1)
+	os.Stdin.Read(buffer)
+}
+
+// end text animation and introduction manipulation
+
 func main() {
+	welcomeMessage := "Welcome to my TUI Portfolio!\nPlease hire me!\nPress any key to continue..."
+	typeOutText(welcomeMessage)
+	waitForKeyPress()
+	fmt.Print("\033[H\033[2J")
 	fmt.Println(ASCIIHeader)
 	generateQuote()
 }
