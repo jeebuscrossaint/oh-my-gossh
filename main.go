@@ -35,6 +35,7 @@ const (
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	server, err := wish.NewServer(
 		wish.WithAddress(net.JoinHostPort(host, port)),
 		wish.WithHostKeyPath(".ssh/id_ed25519"),
@@ -68,7 +69,7 @@ func main() {
 }
 
 func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
-	pages := []string{"~", "$ whoami", "projects.cc", "find me.js"}
+	pages := []string{"~", "$ whoami", "projects.cc", "find me.js", "funny"}
 
 	/*projects := []string{"AEV-Software", "Constrict", "SSHowcase", "Yavafetch", "mleko-czekoladowe-os", "jeebuscrossaint.github.io", "dotfiles"}
 	itemizedProjects := []list.Item{
@@ -91,15 +92,22 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		itemizedProjects = append(itemizedProjects, item{title: project.Name, desc: project.Description})
 	}
 
+	clientIP := s.RemoteAddr().String()
+	if host, _, err := net.SplitHostPort(clientIP); err == nil {
+		clientIP = host
+	}
+
 	initialModel := model{
-		pageIndex:   0,
-		pages:       pages,
-		projects:    projects,
-		projectOpen: false,
-		list:        list.New(itemizedProjects, list.NewDefaultDelegate(), 0, 0),
-		keys:        DefaultKeyMap,
-		help:        help.New(),
-		quote:       getRandomQuote(),
+		pageIndex:    0,
+		pages:        pages,
+		projects:     projects,
+		projectOpen:  false,
+		list:         list.New(itemizedProjects, list.NewDefaultDelegate(), 0, 0),
+		keys:         DefaultKeyMap,
+		help:         help.New(),
+		quote:        getRandomQuote(),
+		clientIP:     clientIP,
+		cmatrixState: "",
 	}
 
 	initialModel.list.InfiniteScrolling = true
@@ -158,6 +166,8 @@ type model struct {
 	help         help.Model
 	ready        bool
 	quote        string
+	clientIP     string
+	cmatrixState string
 }
 
 func check(e error, check string) {
@@ -322,6 +332,8 @@ func saturateContent(m model, viewportWidth int) string {
 	case 3: // irc
 		content, err = rawMarkdownPageTemplate.Render(getMarkdown("find me.js"))
 		check(err, "Gleam Markdown Render")
+	case 4: // funny
+		content = fmt.Sprintf("Your IP: %s\n\n%s", m.clientIP, m.cmatrixState)
 	}
 
 	return content
@@ -406,7 +418,18 @@ func (m model) viewportFooter() string {
 
 // Empty init for now since there's not much hard logic
 func (m model) Init() tea.Cmd {
-	return tea.SetWindowTitle("Amarnath's Portfolio TUI 😀")
+	return tea.Batch(
+		tea.SetWindowTitle("Amarnath's Portfolio TUI 😀"),
+		tea.Tick(time.Millisecond*100, func(t time.Time) tea.Msg {
+			return tea.TickMsg(t)
+		}),
+	)
+}
+
+type TickMsg struct {
+	Time time.Time
+	tag  int
+	ID   int
 }
 
 // Bubbletea update/msg handling
@@ -457,6 +480,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						m.openProject = m.list.Index()
 					}
 				}
+			}
+		case tea.TickMsg:
+			if m.pageIndex == 4 {
+				m.cmatrixState = generateCMatrix(m.viewport.Width, m.viewport.Height-5) // -5 for header and IP display
+				return m, tea.Tick(time.Millisecond*100, func(t time.Time) tea.Msg {
+					return tea.TickMsg(t)
+				})
 			}
 		case 4: // Scroll wheel up
 			if m.pageIndex == 2 && !m.projectOpen {
@@ -624,4 +654,20 @@ func loadProjects() ([]Project, error) {
 	}
 
 	return projects, nil
+}
+
+func generateCMatrix(width, height int) string {
+	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"
+	var builder strings.Builder
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			if rand.Float32() < 0.1 {
+				builder.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("green")).Render(string(chars[rand.Intn(len(chars))])))
+			} else {
+				builder.WriteString(" ")
+			}
+		}
+		builder.WriteString("\n")
+	}
+	return builder.String()
 }
