@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -69,7 +70,7 @@ func main() {
 func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	pages := []string{"~", "$ whoami", "projects.cc", "find me.js"}
 
-	projects := []string{"AEV-Software", "Constrict", "SSHowcase", "Yavafetch", "mleko-czekoladowe-os", "jeebuscrossaint.github.io", "dotfiles"}
+	/*projects := []string{"AEV-Software", "Constrict", "SSHowcase", "Yavafetch", "mleko-czekoladowe-os", "jeebuscrossaint.github.io", "dotfiles"}
 	itemizedProjects := []list.Item{
 		item{title: "Alset Solar CyberSedan Software", desc: "Full stack system behind the FAUHS AEV solar car."},
 		item{title: "Constrict", desc: "A simple, fast, and easy to use build system for any language."},
@@ -78,6 +79,16 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		item{title: "mleko-czekoladowe-os", desc: "A simple operating system written in Rust and Assembly."},
 		item{title: "jeebuscrossaint.github.io", desc: "My personal website. It's a work in progress and where I store my static documentation pages."},
 		item{title: "dotfiles", desc: "My personal dotfiles. I use them to configure my system and make it look nice like rice."},
+	}*/
+
+	projects, err := loadProjects()
+	if err != nil {
+		log.Error("Could not load projects", "error", err)
+	}
+
+	var itemizedProjects []list.Item
+	for _, project := range projects {
+		itemizedProjects = append(itemizedProjects, item{title: project.Name, desc: project.Description})
 	}
 
 	initialModel := model{
@@ -132,9 +143,10 @@ const ASCII = `
 `
 
 type model struct {
-	pageIndex    int
-	pages        []string
-	projects     []string
+	pageIndex int
+	pages     []string
+	//projects     []string
+	projects     []Project
 	projectOpen  bool
 	openProject  int
 	projectView  string
@@ -259,28 +271,31 @@ func (i item) Title() string       { return i.title }
 func (i item) Description() string { return i.desc }
 func (i item) FilterValue() string { return i.title }
 
-func openProject(selectedProject int, projects []string, viewportWidth int) string {
-	for indexedProject, project := range projects {
-		if indexedProject == selectedProject {
-			rawProjectPageTemplate, _ := glamour.NewTermRenderer(
-				glamour.WithStylePath("assets/MDStyle.json"),
-				// glamour.WithAutoStyle(), - For Light/Darkmode styling except I'd rather use my custom style
-				glamour.WithWordWrap(viewportWidth-20),
-			)
-
-			projectPage, err := rawProjectPageTemplate.Render(getMarkdown("projects/" + project))
-			check(err, "Project Glamour Render")
-
-			return projectPage
-		}
+func openProject(selectedProject int, projects []Project, viewportWidth int) string {
+	if selectedProject < 0 || selectedProject >= len(projects) {
+		return "Invalid project selection"
 	}
-	return fmt.Sprintf("Could not get %s project info...", projects[selectedProject])
+
+	project := projects[selectedProject]
+	rawProjectPageTemplate, _ := glamour.NewTermRenderer(
+		glamour.WithStylePath("assets/MDStyle.json"),
+		glamour.WithWordWrap(viewportWidth-20),
+	)
+
+	projectPage, err := rawProjectPageTemplate.Render(getMarkdown("projects/" + project.Name))
+	if err != nil {
+		return fmt.Sprintf("Error rendering project %s: %v", project.Name, err)
+	}
+
+	return projectPage
 }
 
 // Function to read and return markdown file data for each page
 func getMarkdown(filename string) string {
-	fileData, err := os.ReadFile("./assets/markdown/" + filename + ".md")
-	check(err, "Markdown File IO")
+	fileData, err := os.ReadFile(filepath.Join("assets", "markdown", filename+".md"))
+	if err != nil {
+		return fmt.Sprintf("Error reading markdown file: %v", err)
+	}
 
 	return string(fileData)
 }
@@ -577,4 +592,36 @@ func (m model) View() string {
 	nav = lipgloss.PlaceHorizontal(m.viewport.Width, lipgloss.Center, navStyle.Render(nav))
 
 	return header + "\n" + quote + "\n" + nav + m.content + navStyle.Render(m.help.View(m.keys))
+}
+
+type Project struct {
+	Name        string
+	Description string
+}
+
+func loadProjects() ([]Project, error) {
+	var projects []Project
+	files, err := os.ReadDir("assets/configs")
+	if err != nil {
+		return nil, err
+	}
+
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), ".conf") {
+			content, err := os.ReadFile(filepath.Join("assets/configs", file.Name()))
+			if err != nil {
+				return nil, err
+			}
+
+			name := strings.TrimSuffix(file.Name(), ".conf")
+			description := strings.TrimSpace(string(content))
+
+			projects = append(projects, Project{
+				Name:        name,
+				Description: description,
+			})
+		}
+	}
+
+	return projects, nil
 }
