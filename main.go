@@ -71,17 +71,6 @@ func main() {
 func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	pages := []string{"~", "$ whoami", "projects.cc", "find me.js", "funny"}
 
-	/*projects := []string{"AEV-Software", "Constrict", "SSHowcase", "Yavafetch", "mleko-czekoladowe-os", "jeebuscrossaint.github.io", "dotfiles"}
-	itemizedProjects := []list.Item{
-		item{title: "Alset Solar CyberSedan Software", desc: "Full stack system behind the FAUHS AEV solar car."},
-		item{title: "Constrict", desc: "A simple, fast, and easy to use build system for any language."},
-		item{title: "SSHowcase", desc: "A terminal user interface for my portfolio."},
-		item{title: "Yavafetch", desc: "A simple system information tool written in JavaScript. Works only on windows."},
-		item{title: "mleko-czekoladowe-os", desc: "A simple operating system written in Rust and Assembly."},
-		item{title: "jeebuscrossaint.github.io", desc: "My personal website. It's a work in progress and where I store my static documentation pages."},
-		item{title: "dotfiles", desc: "My personal dotfiles. I use them to configure my system and make it look nice like rice."},
-	}*/
-
 	projects, err := loadProjects()
 	if err != nil {
 		log.Error("Could not load projects", "error", err)
@@ -151,9 +140,8 @@ const ASCII = `
 `
 
 type model struct {
-	pageIndex int
-	pages     []string
-	//projects     []string
+	pageIndex    int
+	pages        []string
 	projects     []Project
 	projectOpen  bool
 	openProject  int
