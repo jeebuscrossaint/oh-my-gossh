@@ -1,3 +1,0 @@
-# yavaskreept
-
-fetch le yajva
