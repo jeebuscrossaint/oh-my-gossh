@@ -1,5 +1,9 @@
 package main
 
-func main() {
+import (
+	"oh-my-gossh/app"
+)
 
+func main() {
+	app.Exists()
 }
