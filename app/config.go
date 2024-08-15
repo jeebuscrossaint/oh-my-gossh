@@ -8,6 +8,8 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+var GlobalConfig Config
+
 type Config struct {
 	Title    Title
 	SSH      SSH
@@ -38,7 +40,8 @@ type Project struct {
 	About string
 }
 
-func Parse() {
+func LoadConfig() (Config, error) {
+	var config Config
 	var filePath string
 	if runtime.GOOS == "windows" {
 		filePath = os.ExpandEnv("%USERPROFILE%\\.config\\ohmygossh\\gossh.toml")
@@ -46,38 +49,23 @@ func Parse() {
 		filePath = os.ExpandEnv("$HOME/.config/ohmygossh/gossh.toml")
 	}
 
-	fmt.Printf("Reading config from: %s\n", filePath)
-
-	// Read the file contents
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		fmt.Printf("Error reading file: %v\n", err)
-		os.Exit(1)
+		return Config{}, fmt.Errorf("error reading file: %v", err)
 	}
 
-	// Print the raw contents of the file
-	//fmt.Println("Raw TOML content:")
-	//fmt.Println(string(data))
-
-	var config Config
 	if _, err := toml.Decode(string(data), &config); err != nil {
-		fmt.Printf("Error decoding TOML: %v\n", err)
-		os.Exit(1)
+		return Config{}, fmt.Errorf("error decoding TOML: %v", err)
 	}
 
-	fmt.Printf("Title: %+v\n", config.Title)
-	fmt.Printf("SSH: %+v\n", config.SSH)
-	fmt.Printf("Color: %+v\n", config.Color)
+	return config, nil
+}
 
-	if config.Projects == nil {
-		fmt.Println("Projects is nil")
-	} else {
-		fmt.Printf("Projects: %+v\n", config.Projects)
-		for key, project := range config.Projects {
-			fmt.Printf("Project [%s]: %+v\n", key, project)
-		}
+func InitConfig() error {
+	config, err := LoadConfig()
+	if err != nil {
+		return err
 	}
-
-	// Print the entire config struct
-	//fmt.Printf("Full config: %+v\n", config)
+	GlobalConfig = config
+	return nil
 }
