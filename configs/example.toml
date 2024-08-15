@@ -4,9 +4,9 @@ subtitle = "Memory safe programming language"
 tab = "oh my gossh"
 
 [ssh]
-status = "true"
+status = 1
 host = "localhost"
-port = "19"
+port = 19
 
 [color]
 active = "#00FF00"
