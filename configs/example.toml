@@ -1,0 +1,18 @@
+[title]
+name = "Golang"
+subtitle = "Memory safe programming language"
+tab = "oh my gossh"
+
+[ssh]
+status = "true"
+host = "localhost"
+port = "19"
+
+[color]
+active = "#00FF00"
+inactive = "#000000"
+
+[example]
+file = "example"
+name = "foo"
+about = "Example project"
