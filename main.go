@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	app.Exists()
+	app.Parse()
 }

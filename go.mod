@@ -2,7 +2,10 @@ module oh-my-gossh
 
 go 1.22.6
 
-require github.com/charmbracelet/bubbles v0.18.0
+require (
+	github.com/BurntSushi/toml v1.4.0
+	github.com/charmbracelet/bubbles v0.18.0
+)
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect

@@ -4,64 +4,46 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/BurntSushi/toml"
 )
 
 type Title struct {
-	Name     string `json:"name"`
-	Subtitle string `json:"subtitle"`
-	Tab      string `json:"tab"`
+	Name     string
+	Subtitle string
+	Tab      string
 }
 
 type SSH struct {
-	Status bool   `json:"status"`
-	Host   string `json:"host"`
-	Port   int    `json:"port"`
+	Status int
+	Host   string
+	Port   int
 }
 
 type Color struct {
-	Active   string `json:"active"`
-	Inactive string `json:"inactive"`
+	Active   string
+	Inactive string
 }
 
 type Config struct {
-	Title  Title          `json:"title"`
-	SSH    SSH            `json:"ssh"`
-	Color  Color          `json:"color"`
-	Extras map[string]any `json:"-"`
+	Title  Title
+	SSH    SSH
+	Color  Color
+	Extras map[string]any `toml:"-"`
 }
 
-func Exists() bool {
+func Parse() Config {
+	var config Config
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		fmt.Println("Error getting home directory:", err)
-		return false
+		fmt.Println(err)
+		os.Exit(1)
 	}
-
-	configPath := filepath.Join(homeDir, ".config", "ohmygossh", "gossh.toml")
-
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		// File does not exist, create it
-		err = os.MkdirAll(filepath.Dir(configPath), 0755)
-		if err != nil {
-			fmt.Println("Error creating directories:", err)
-			return false
-		}
-
-		file, err := os.Create(configPath)
-		if err != nil {
-			fmt.Println("Error creating file:", err)
-			return false
-		}
-		defer file.Close()
-		fmt.Println("Config file created:", configPath)
-		return true
+	configFile := filepath.Join(homeDir, ".config", "ohmygossh", "gossh.toml")
+	_, err = toml.DecodeFile(configFile, &config)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
-
-	fmt.Println("Config file exists:", configPath)
-	Parse()
-	return true
-}
-
-func Parse() {
-
+	return config
 }
