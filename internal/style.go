@@ -1,4 +1,4 @@
-package frontend
+package internal
 
 var TermHeight int
 
