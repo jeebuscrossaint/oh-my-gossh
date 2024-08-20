@@ -12,6 +12,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	//fmt.Printf("%s\n", app.GlobalConfig.Title.Name)
+	fmt.Printf("%s\n", app.GlobalConfig.Title.Page)
 
 }

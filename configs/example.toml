@@ -1,4 +1,5 @@
 [title]
+page = "Example TUI Name Header"
 name = "Golang"
 subtitle = "Memory safe programming language"
 tab = "oh my gossh"
@@ -11,8 +12,10 @@ port = 19
 [color]
 active = "#00FF00"
 inactive = "#000000"
+letter = "#FFFFFF"
 
-[example]
+[projects]
+[projects.example]
 file = "example"
 name = "foo"
 about = "Example project"

@@ -18,6 +18,7 @@ type Config struct {
 }
 
 type Title struct {
+	Page     string
 	Name     string
 	Subtitle string
 	Tab      string
@@ -32,6 +33,7 @@ type SSH struct {
 type Color struct {
 	Active   string
 	Inactive string
+	Letter   string
 }
 
 type Project struct {
