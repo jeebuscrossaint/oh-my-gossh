@@ -12,22 +12,35 @@ import (
 func Tui() (tea.Model, []tea.ProgramOption) {
 
 	err := InitConfig()
-	internal.Error(err, "TOML is broken, check your config file", true)
+    internal.Error(err, "TOML is broken, check your config file", true)
 
-	tabs := []string{"main.go", "projects.cc", "about.rs", "contact.sh"}
+    tabs := []string{"main.go", "projects.cc", "about.rs", "contact.sh"}
 
-	projects := []string{}
-	itemizedProjects := []list.Item{}
+    // Create slices to hold projects
+    projects := []string{}
+    itemizedProjects := []list.Item{}
 
-	initModel := Model{
-		PageIndex:   0,
-		Pages:       tabs,
-		Projects:    projects,
-		ProjectOpen: false,
-		List:        list.New(itemizedProjects, list.NewDefaultDelegate(), 0, 0),
-		Keys:        internal.DefaultKeyMap,
-		Help:        help.New(),
-	}
+    // Populate projects from GlobalConfig
+    for _, project := range GlobalConfig.Projects {
+        // Add project file path to projects slice
+        projects = append(projects, project.File)
+        
+        // Add project as list item
+        itemizedProjects = append(itemizedProjects, internal.Item{
+            TitleText: project.Name,
+            Desc:      project.About,
+        })
+    }
+
+    initModel := Model{
+        PageIndex:   0,
+        Pages:       tabs,
+        Projects:    projects,
+        ProjectOpen: false,
+        List:        list.New(itemizedProjects, list.NewDefaultDelegate(), 0, 0),
+        Keys:        internal.DefaultKeyMap,
+        Help:        help.New(),
+    }
 
 	initModel.List.InfiniteScrolling = true
 	initModel.List.DisableQuitKeybindings()

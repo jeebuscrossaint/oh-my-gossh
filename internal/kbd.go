@@ -5,18 +5,33 @@ import (
 )
 
 type KeyMap struct {
-	Navigate key.Binding
-	Up       key.Binding
-	Down     key.Binding
-	Left     key.Binding
-	Right    key.Binding
-	LCycle   key.Binding
-	RCycle   key.Binding
-	Enter    key.Binding
-	Back     key.Binding
-	Help     key.Binding
-	Quit     key.Binding
-	FullHelp key.Binding
+	Navigate        key.Binding
+	Up              key.Binding
+	Down            key.Binding
+	Left            key.Binding
+	Right           key.Binding
+	LCycle          key.Binding
+	RCycle          key.Binding
+	Enter           key.Binding
+	Back            key.Binding
+	Help            key.Binding
+	Quit            key.Binding
+	FullHelpBinding key.Binding
+}
+
+// ShortHelp returns keybindings to show in the minimal help view
+func (k KeyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Help, k.Quit}
+}
+
+// FullHelp returns keybindings for the expanded help view
+func (k KeyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+		{k.Up, k.Down},    // First column
+		{k.Left, k.Right}, // Second column
+		{k.Enter, k.Back}, // Third column
+		{k.Help, k.Quit},  // Fourth column
+	}
 }
 
 var DefaultKeyMap = KeyMap{
@@ -60,7 +75,7 @@ var DefaultKeyMap = KeyMap{
 		key.WithKeys("?"),
 		key.WithHelp("?", "toggle help"),
 	),
-	FullHelp: key.NewBinding(
+	FullHelpBinding: key.NewBinding(
 		key.WithKeys("shift+?", "f1"),
 		key.WithHelp("f1", "full help"),
 	),

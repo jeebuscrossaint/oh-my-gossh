@@ -20,6 +20,7 @@ type Config struct {
 type Title struct {
 	Page     string
 	Name     string
+	AsciiArt string `toml:"ascii_file"` // path to ascii art if wanted.
 	Subtitle string
 	Tab      string
 }
@@ -46,22 +47,30 @@ func LoadConfig() (Config, error) {
 	var config Config
 	var filePath string
 	if runtime.GOOS == "windows" {
-		filePath = os.ExpandEnv("%USERPROFILE%\\.config\\ohmygossh\\gossh.toml")
+	    filePath = os.ExpandEnv("%USERPROFILE%\\.config\\ohmygossh\\gossh.toml")
 	} else {
-		filePath = os.ExpandEnv("$HOME/.config/ohmygossh/gossh.toml")
+	    filePath = os.ExpandEnv("$HOME/.config/ohmygossh/gossh.toml")
 	}
-
+    
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return Config{}, fmt.Errorf("error reading file: %v", err)
+	    return Config{}, fmt.Errorf("error reading file: %v", err)
 	}
-
+    
 	if _, err := toml.Decode(string(data), &config); err != nil {
-		return Config{}, fmt.Errorf("error decoding TOML: %v", err)
+	    return Config{}, fmt.Errorf("error decoding TOML: %v", err)
 	}
-
+    
+	// Load ASCII art - now required
+	asciiPath := os.ExpandEnv(config.Title.AsciiArt)
+	asciiData, err := os.ReadFile(asciiPath)
+	if err != nil {
+	    return Config{}, fmt.Errorf("error reading ASCII art file: %v", err)
+	}
+	config.Title.AsciiArt = string(asciiData)
+    
 	return config, nil
-}
+    }
 
 func InitConfig() error {
 	config, err := LoadConfig()
