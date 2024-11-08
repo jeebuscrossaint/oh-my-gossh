@@ -16,6 +16,7 @@ type KeyMap struct {
 	Back     key.Binding
 	Help     key.Binding
 	Quit     key.Binding
+	FullHelp key.Binding
 }
 
 var DefaultKeyMap = KeyMap{
@@ -58,6 +59,10 @@ var DefaultKeyMap = KeyMap{
 	Help: key.NewBinding(
 		key.WithKeys("?"),
 		key.WithHelp("?", "toggle help"),
+	),
+	FullHelp: key.NewBinding(
+		key.WithKeys("shift+?", "f1"),
+		key.WithHelp("f1", "full help"),
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "ctrl+c"),
