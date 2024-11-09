@@ -52,22 +52,26 @@ func GetMarkdown(filename string) string {
 // OpenProject renders a markdown project file with glamour
 func OpenProject(selectedProject int, projects []string, viewportWidth int) string {
 	if selectedProject < 0 || selectedProject >= len(projects) {
-		return "Invalid project selection"
+	    return "Invalid project selection"
 	}
-
+    
+	// Create renderer with custom style from JSON file
 	renderer, err := glamour.NewTermRenderer(
-		glamour.WithWordWrap(viewportWidth - 20),
+	    glamour.WithStylePath("assets/MDStyle.json"), // Use same style as other pages
+	    glamour.WithWordWrap(viewportWidth-20),
 	)
 	Check(err, "Glamour renderer creation", false)
-
+    
+	// Get project content
 	project := projects[selectedProject]
 	content := GetMarkdown(project)
-
+    
+	// Render the markdown
 	rendered, err := renderer.Render(content)
 	Check(err, "Project render", false)
-
+    
 	return rendered
-}
+    }
 
 // CalculateNavItemSize returns the width and height of navigation items
 func CalculateNavItemSize(title string) (width int, height int) {
