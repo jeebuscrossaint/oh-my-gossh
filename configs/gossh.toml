@@ -8,7 +8,7 @@ tab = "oh my gossh"
 pages = ["main", "projects", "about", "contact"]
 
 [ssh]
-status = 0
+status = 1
 host = "localhost"
 port = 19
 
