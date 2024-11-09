@@ -14,7 +14,12 @@ type Config struct {
 	Title    Title
 	SSH      SSH
 	Color    Color
+	Style    Style
 	Projects map[string]Project
+}
+
+type Style struct {
+	MDPath string `toml:"md_style"` // path to markdown style
 }
 
 type Title struct {

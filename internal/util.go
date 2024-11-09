@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"path/filepath"
 
 	//"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/glamour"
@@ -31,10 +32,22 @@ func (i Item) FilterValue() string { return i.TitleText }
 
 // GetMarkdown reads and returns markdown file contents
 func GetMarkdown(filename string) string {
-	fileData, err := os.ReadFile(filename)
+	// For core pages (main, about, contact)
+	basePath := os.ExpandEnv("$HOME/.config/ohmygossh")
+	var fullPath string
+    
+	// Check if it's a project file
+	if strings.HasPrefix(filename, "projects/") {
+	    fullPath = filepath.Join(basePath, filename)
+	} else {
+	    // Core pages
+	    fullPath = filepath.Join(basePath, filename + ".md")
+	}
+    
+	fileData, err := os.ReadFile(fullPath)
 	Check(err, "Markdown File IO", false)
 	return string(fileData)
-}
+    }
 
 // OpenProject renders a markdown project file with glamour
 func OpenProject(selectedProject int, projects []string, viewportWidth int) string {
