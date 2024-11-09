@@ -1,0 +1,28 @@
+[style]
+md_style = "$HOME/.config/ohmygossh/MDStyle.json"
+
+[title]
+ascii_file = "$HOME/.config/ohmygossh/ascii.txt"
+subtitle = "The most customizable portfolio TUI I think I have ever seen."
+tab = "oh my gossh"
+pages = ["main", "projects", "about", "contact"]
+
+[ssh]
+status = 0
+host = "localhost"
+port = 19
+
+[color]
+active = "#00FF00"
+inactive = "#000000"
+letter = "#FFFFFF"
+
+[projects]
+[projects.example]
+file = "projects/example.md"
+name = "foo"
+about = "Example project"
+[projects.brainrot]
+file = "projects/brainrot.md"
+name = "help"
+about = "fortnite"

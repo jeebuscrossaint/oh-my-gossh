@@ -23,8 +23,6 @@ type Style struct {
 }
 
 type Title struct {
-	Page     string
-	Name     string
 	AsciiArt string `toml:"ascii_file"` // path to ascii art if wanted.
 	Subtitle string
 	Tab      string

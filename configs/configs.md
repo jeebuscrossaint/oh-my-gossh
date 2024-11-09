@@ -1,52 +1,47 @@
 # Config Guide
 
-The configuration file is located in $HOME/.config/ohmygossh/gossh.toml
+## Introduction
 
-Below is an example of the configuration file, if you are not familiar with TOML. The `title`, `ssh`, and `color` sections are **required**, while the user (YOU!) can make as many sections as they want, provided it follows the format below. 
+I will go over the configuration for this project section by section in the toml file.
+You can also edit the color scheme by editing the MDStyle.json file which its location is specified by you in the config file.
+First thing you need to do is to create the directory for the project. 
+On windows:
+You are going to make a directory and file at this location:
+`%USERPROFILE%\\.config\\ohmygossh\\gossh.toml`
 
-### title
-- name: The text/big header/ usually ASCII art that you want in teh center of the terminal
-- subtitle: The subtitle of the title, a small blurb or quote.
-- tab: The tab name that you want to be displayed in the terminal
+On pretty much any other OS:
+You are going to make a directory and file at this location:
+`$HOME/.config/ohmygossh/gossh.toml`
 
-### ssh
-- status: The status of the SSH connection, either true or false. If false the TUI displays locally on your window, if true it will display the remote server.
-- host: The host of the SSH connection, usually an IP address or domain name.\
-- port: The port of the SSH connection, usually 23 or 19 for this case.
+## Config File
 
-### color
-- active: The color of the active tab
-- inactive: The color of the inactive tab
+### Style
+This section is for the color scheme of the terminal. You can edit the colors in the MDStyle.json file.
 
-### projects
-- file: The file name of the project, should be a directory to an exact markdown file, ie $HOME/.config/ohmygossh/projects/example.md
-- name: The name of the project
-- about: A small blurb about the project
+### Title
+This section specifies a couple things.
+Firstly, the location of the ascii art file. You can change this to any ascii art file you want.
+It is the thing that goes at the top of the terminal. It is circled red and pointed red in the image at the bottom of this guide.
+Secondly the subtitle. This is the text that goes under the ascii art. It can be anything you want, a quote, a joke, or just a message. It is light red in the image.
+Next, the tab name. This is the name the tab will have in the terminal. It is circled blue in the image.
+Lastly, the name of the pages in the terminal like main | about | projects | contact. It is circled green in the image.
 
-Below is an example of the configuration file in TOML format.
+### SSH
+There are three components in the SSH section of the config.
+Firstly a boolean integer that specifies if you want to use the ssh feature. If you want to use it, set it to 1, if not, set it to 0.
+Secondly, the host. By default it is set to localhost. You can change it to any host you want.
+Lastly the port you want to serve the ssh server on. By default it is set to 19.
 
-```toml
+### Color
+It can change the colors of stuff in the thing (it doesn't actaully work just configure colors in the MDStyle.json file)
 
+### Projects
+You can define as many projects as you would like.
+Each project has a file, name, and about.
+The file is the location of the markdown file for the project. It looks for files in the config directory so if you specify a markdown file in the projects directory, you would put `projects/example.md` for the file.
+The name of the project is the name that will be displayed in the projects page.
+The about is a short description of the project that will be displayed in the projects page.
 
-[title]
-name = "Golang"
-subtitle = "Memory safe programming language"
-tab = "oh my gossh"
+Here is an image to give you a visual representation:
 
-[ssh]
-status = "true"
-host = "0.0.0.0"
-port = "19"
-
-[color]
-active = "#00FF00"
-inactive = "#000000"
-
-[example]
-file = "example"
-name = "foo"
-about = "Example project"
-
-```
-
-____________________
+![Showcase](../assets/showcase.png)
