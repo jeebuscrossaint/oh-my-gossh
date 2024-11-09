@@ -34,6 +34,8 @@ Lastly the port you want to serve the ssh server on. By default it is set to 19.
 
 ### Color
 It can change the colors of stuff in the thing (it doesn't actaully work just configure colors in the MDStyle.json file)
+Refer to the [Glamour styles documentation](https://github.com/charmbracelet/glamour/tree/master/styles) for guidance on available options.
+
 
 ### Projects
 You can define as many projects as you would like.

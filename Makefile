@@ -17,7 +17,7 @@ BUILDFLAGS=-trimpath     # Remove file system paths from binary
 # Optimization flags for release builds
 RELEASE_FLAGS=$(LDFLAGS) $(BUILDFLAGS) -tags release
 
-.PHONY: all build clean install test help
+.PHONY: all build clean install test help firsttime
 
 # Default target
 all: build
@@ -56,3 +56,11 @@ help:
 	@echo "  install  - Install binary to system"
 	@echo "  test     - Run tests"
 	@echo "  deps     - Update dependencies"
+
+firsttime:
+	@echo "Creating directories..."
+	@mkdir -p $(HOME)/.config/oh-my-gossh
+	@cp MDStyle.json $(HOME)/.config/oh-my-gossh/MDStyle.json
+	@cp configs/gossh.toml $(HOME)/.config/oh-my-gossh/gossh.toml
+	@echo "Done! Read more by reading configs/configs.md"
+	
