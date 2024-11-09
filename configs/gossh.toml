@@ -22,7 +22,3 @@ letter = "#FFFFFF"
 file = "projects/example.md"
 name = "foo"
 about = "Example project"
-[projects.brainrot]
-file = "projects/brainrot.md"
-name = "help"
-about = "fortnite"
