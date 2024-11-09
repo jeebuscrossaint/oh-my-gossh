@@ -2,6 +2,7 @@ package app
 
 import (
 	"oh-my-gossh/internal"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -184,8 +185,9 @@ func (m Model) View() string {
 	}
 
 	// Render header from ASCII art file
-	header := lipgloss.PlaceHorizontal(m.Viewport.Width, lipgloss.Center,
-		BubbleLetterStyle.Render(GlobalConfig.Title.AsciiArt))
+	header := strings.Repeat("\n", 2) + // Add 2 blank lines at top
+        lipgloss.PlaceHorizontal(m.Viewport.Width, lipgloss.Center,
+            BubbleLetterStyle.Render(GlobalConfig.Title.AsciiArt))
 
 	// Add newline before subtitle for spacing
 	subtitle := "\n" + lipgloss.PlaceHorizontal(m.Viewport.Width, lipgloss.Center,

@@ -23,6 +23,7 @@ type Title struct {
 	AsciiArt string `toml:"ascii_file"` // path to ascii art if wanted.
 	Subtitle string
 	Tab      string
+	Pages    []string `toml:"pages"` // list of pages
 }
 
 type SSH struct {

@@ -14,7 +14,11 @@ func Tui() (tea.Model, []tea.ProgramOption) {
 	err := InitConfig()
     internal.Error(err, "TOML is broken, check your config file", true)
 
-    tabs := []string{"main.go", "projects.cc", "about.rs", "contact.sh"}
+    tabs := GlobalConfig.Title.Pages
+    if len(tabs) == 0 {
+        // Fallback to defaults if not specified
+        tabs = []string{"main.go", "projects.cc", "about.rs", "contact.sh"}
+    }
 
     // Create slices to hold projects
     projects := []string{}
