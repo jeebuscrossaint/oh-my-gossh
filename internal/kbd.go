@@ -25,13 +25,11 @@ func (k KeyMap) ShortHelp() []key.Binding {
 }
 
 // FullHelp returns keybindings for the expanded help view
+// FullHelp returns keybindings for the expanded help view
 func (k KeyMap) FullHelp() [][]key.Binding {
-	return [][]key.Binding{
-		{k.Up, k.Down},    // First column
-		{k.Left, k.Right}, // Second column
-		{k.Enter, k.Back}, // Third column
-		{k.Help, k.Quit},  // Fourth column
-	}
+    return [][]key.Binding{
+        {k.Up, k.Down, k.Left, k.Right, k.Enter, k.Back, k.Help, k.Quit}, // All bindings in a single row
+    }
 }
 
 var DefaultKeyMap = KeyMap{

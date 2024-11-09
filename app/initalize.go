@@ -3,6 +3,7 @@ package app
 import (
 	"oh-my-gossh/internal"
 	"strings"
+	"fmt"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -198,5 +199,21 @@ func (m Model) View() string {
 		NavStyle.Render(nav))
 
 	// Combine all elements with proper spacing
-	return header + subtitle + nav + m.Content + NavStyle.Render(m.Help.View(m.Keys))
+	var helpText string
+	if m.Help.ShowAll {
+	    helpText = fmt.Sprintf(" %s • %s • %s • %s • %s • %s • %s • %s ",
+		m.Keys.Up.Help().Key,
+		m.Keys.Down.Help().Key,
+		m.Keys.Left.Help().Key,
+		m.Keys.Right.Help().Key,
+		m.Keys.Enter.Help().Key,
+		m.Keys.Back.Help().Key,
+		m.Keys.Help.Help().Key,
+		m.Keys.Quit.Help().Key,
+	    )
+	} else {
+	    helpText = m.Help.View(m.Keys)
+	}
+	
+	return header + subtitle + nav + m.Content + NavStyle.Render(helpText)
 }
