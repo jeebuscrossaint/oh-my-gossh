@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  sshfolio:
+  oh-my-gossh:
     build:
       context: .
       dockerfile: Dockerfile
